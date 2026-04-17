@@ -33,7 +33,7 @@
   --accent-glow: rgba(255, 110, 0, 0.4);
   --accent-success: #22c55e;
   --accent-error: #ef4444;
-  --flash-sale: #ef4444;
+  --timer-bar: #ef4444;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -343,8 +343,8 @@ input::placeholder {
   color: var(--text-secondary);
 }
 
-/* ===== FLASH SALE TIMER ===== */
-.flash-sale-container {
+/* ===== Timer TIMER ===== */
+.timer-bar-container {
   background: rgba(0, 0, 0, 0.4);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
@@ -353,19 +353,19 @@ input::placeholder {
   transition: border-color var(--transition-normal);
 }
 
-.flash-sale-header {
+.timer-bar-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--space-xs);
 }
 
-.flash-sale-title {
+.timer-bar-title {
   font-size: 0.85rem;
   font-weight: 900;
   color: var(--text-primary);
 }
 
-.flash-sale-track {
+.timer-bar-track {
   width: 100%;
   height: 12px;
   background: rgba(255, 255, 255, 0.1);
@@ -373,22 +373,22 @@ input::placeholder {
   overflow: hidden;
 }
 
-.flash-sale-bar {
+.timer-bar-bar {
   height: 100%;
   background: linear-gradient(90deg, #f59e0b, #ef4444);
   transition: width 1s linear;
 }
 
-.flash-sale--urgent {
+.timer-bar--urgent {
   border-color: var(--accent-error);
   animation: urgentPulse 1s infinite alternate;
 }
 
-.flash-sale--urgent .flash-sale-title {
+.timer-bar--urgent .timer-bar-title {
   color: var(--accent-error);
 }
 
-.flash-sale--urgent .flash-sale-bar {
+.timer-bar--urgent .timer-bar-bar {
   background: var(--accent-error);
 }
 

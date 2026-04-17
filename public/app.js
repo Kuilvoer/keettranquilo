@@ -82,7 +82,7 @@ if (isIndexPage) {
 
     const joinBtn = document.getElementById('join-btn');
     joinBtn.disabled = false;
-    joinBtn.textContent = 'Betreed Winkel';
+    joinBtn.textContent = 'Join de Keet';
 
     setTimeout(() => {
       errorMessage.style.display = 'none';
@@ -190,7 +190,7 @@ if (isPlayerPage) {
 
     // E-commerce CTA Button Styles
     const colors = ['bol', 'amazon', 'shopify', 'purple'];
-    const icons = ['🛒', '🛍️', '📦', '🎁'];
+    const icons = ['🍻', '💊', '👑', '🎉'];
 
     answersGrid.innerHTML = options
       .map((opt, i) => `
@@ -208,8 +208,8 @@ if (isPlayerPage) {
         selectedAnswer = parseInt(btn.dataset.index);
         btn.classList.add('btn-answer--selected');
         
-        // Processing Order State
-        btn.innerHTML = `<span class="spinner"></span><span class="btn-answer-text">Processing Order...</span>`;
+        // Processing state
+        btn.innerHTML = `<span class="spinner"></span><span class="btn-answer-text">Biertje tappen...</span>`;
 
         answersGrid.querySelectorAll('.btn-answer').forEach((b) => {
           b.disabled = true;
@@ -221,7 +221,7 @@ if (isPlayerPage) {
     });
   });
 
-  // Timer updates (Flash Sale)
+  // Timer updates (Timer)
   socket.on('timerUpdate', ({ time }) => {
     const timerText = document.getElementById('player-timer-text');
     const timerBar = document.getElementById('player-timer-bar');
@@ -229,11 +229,11 @@ if (isPlayerPage) {
     if (timerText) timerText.textContent = time;
     if (timerBar) {
       timerBar.style.width = `${(time / 30) * 100}%`;
-      const flashSaleContainer = document.querySelector('.flash-sale-container');
+      const flashSaleContainer = document.querySelector('.timer-bar-container');
       if (time <= 5 && flashSaleContainer) {
-        flashSaleContainer.classList.add('flash-sale--urgent');
+        flashSaleContainer.classList.add('timer-bar--urgent');
       } else if (flashSaleContainer) {
-        flashSaleContainer.classList.remove('flash-sale--urgent');
+        flashSaleContainer.classList.remove('timer-bar--urgent');
       }
     }
   });
@@ -277,21 +277,21 @@ if (isPlayerPage) {
         audioWrong.currentTime = 0;
         audioWrong.play().catch(e => console.warn(e));
         feedbackIcon.innerHTML = '⏱️';
-        feedbackText.textContent = 'Transaction Cancelled (Timeout)';
+        feedbackText.textContent = 'Te laat, lamzak!';
         playerFeedback.className = 'feedback feedback--incorrect';
         if (scoreLabel) scoreLabel.textContent = 'Huidige balans';
       } else if (isCorrect) {
         audioCorrect.currentTime = 0;
         audioCorrect.play().catch(e => console.warn(e));
         feedbackIcon.innerHTML = '✅';
-        feedbackText.textContent = 'Order Confirmed!';
+        feedbackText.textContent = 'LETS GO';
         playerFeedback.className = 'feedback feedback--correct';
         if (scoreLabel) scoreLabel.textContent = 'Nieuwe Profit ⭐';
       } else {
         audioWrong.currentTime = 0;
         audioWrong.play().catch(e => console.warn(e));
-        feedbackIcon.innerHTML = '<div class="out-of-stock-badge">OUT OF STOCK</div>';
-        feedbackText.textContent = 'Transaction Declined.';
+        feedbackIcon.innerHTML = '<div class="out-of-stock-badge">FOUT</div>';
+        feedbackText.textContent = 'Fout antwoord, kut!';
         playerFeedback.className = 'feedback feedback--incorrect';
         if (scoreLabel) scoreLabel.textContent = 'Huidige balans';
       }
