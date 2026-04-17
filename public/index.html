@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Join De Grote Koningsdag Keet Quiz met je PIN code">
+  <title>De Grote Koningsdag Keet Quiz — Join</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo" style="text-align: center; display: block;">
+      <h1 style="font-size: clamp(1.4rem, 6vw, 2.5rem); line-height: 1.2; margin-bottom: 5px;">🛒 De Grote Koningsdag Keet Quiz</h1>
+      <p style="font-size: 1rem; color: var(--text-secondary); margin-top: 0;">Voer de PIN in om mee te doen</p>
+    </div>
+
+    <div class="card">
+      <div id="error-message" class="error-message"></div>
+
+      <form id="join-form">
+        <div class="form-group">
+          <label for="pin-input">Game PIN</label>
+          <input type="tel" id="pin-input" inputmode="numeric" pattern="[0-9]*" placeholder="Voer PIN in..." maxlength="4" autocomplete="off" required>
+        </div>
+        <div class="form-group">
+          <label for="username-input">Jouw Naam</label>
+          <input type="text" id="username-input" placeholder="Hoe heet je?" maxlength="20" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="join-btn">Join Game</button>
+      </form>
+    </div>
+
+    <p class="credit">door Rody Damman · vibecoded met AI</p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

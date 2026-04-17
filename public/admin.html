@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="De Grote Koningsdag Keet Quiz — Koningsdag Keet Dashboard">
+  <title>Koningsdag Keet Quiz — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Hidden YT Player -->
+  <div id="yt-player" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;"></div>
+
+  <audio id="outro-audio" src="audio/outro-song_oqu8zAg.mp3"></audio>
+
+  <div class="container container--admin">
+    <div class="logo">
+      <h1>🛒 De Grote Koningsdag Keet Quiz</h1>
+
+      <!-- Jukebox Control -->
+      <div class="jukebox-controls"
+        style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
+        <button id="toggle-music-btn" class="btn btn-primary"
+          style="padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; margin:0;">
+          🎵 Jukebox: UIT
+        </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Volume</span>
+          <input type="range" id="volume-slider" min="0" max="100" value="30" style="width: 120px; padding: 0;">
+        </div>
+        <button id="force-end-btn" class="btn-primary"
+          style="background: var(--accent-purple); padding: var(--space-xs) var(--space-sm); font-size: 0.9rem; border: none; font-weight: bold; border-radius: 5px;">
+          ⏭️ Skip naar finale
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== LOBBY VIEW ===== -->
+    <div id="view-lobby">
+      <div class="card admin-split" style="min-height: 60vh;">
+
+        <!-- Left Side: Game Info -->
+        <div class="admin-split-left" style="display: flex; flex-direction: column;">
+          <div class="admin-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-md);">
+            <div class="admin-pin" style="margin-bottom: var(--space-md);">
+              <span class="admin-pin-label">Game PIN</span>
+              <span class="admin-pin-value" id="admin-pin">1234</span>
+            </div>
+            <div class="admin-players">
+              <span class="admin-players-label">Klanten online</span>
+              <span class="admin-players-value" id="admin-player-count">0</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div id="admin-lobby" style="flex: 1; overflow-y: auto; padding-right: 10px;">
+            <h2 class="section-title">Bezoekers in de wachtkamer</h2>
+            <p class="status status-waiting" id="admin-waiting">Wachten op actieve shoppers...</p>
+            <ul class="player-list" id="admin-player-list"></ul>
+          </div>
+
+          <button class="btn btn-start" id="start-game-btn" disabled style="margin-top: var(--space-lg);">
+            🛍️ Open de webshop (start)
+          </button>
+        </div>
+
+        <!-- Right Side: Giant QR -->
+        <div class="admin-split-right"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg); padding: var(--space-xl);">
+          <h2 style="font-size: 2.2rem; font-weight: 900; margin-bottom: 15px;">Scan & shop</h2>
+          <img id="qr-code-img" src="" alt="QR Code"
+            style="width: 100%; max-width: 50vh; height: auto; border-radius: 12px; background: white; padding: 15px;">
+          <p style="margin-top: 15px; color: var(--text-secondary); font-size: 1.1rem; text-align: center;">Of typ de
+            game link in op je browser.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== QUESTION VIEW ===== -->
+    <div id="view-question" class="hidden">
+      <div class="card admin-split">
+
+        <!-- Left Side: Titles and Timer -->
+        <div class="admin-split-left">
+          <div class="admin-question-header" style="justify-content: flex-start; gap: 2rem;">
+            <span class="admin-question-counter" id="question-counter">Sale 1 / 20</span>
+            <button id="skip-question-btn" class="btn-primary"
+              style="padding: 5px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background: var(--accent-error);">
+              ⏭️ Skip vraag
+            </button>
+          </div>
+
+          <p class="question-text" id="admin-question-text">Productbeschrijving wordt geladen...</p>
+
+          <div class="flash-sale-container" style="margin-top: auto; width: 100%;">
+            <div class="flash-sale-header">
+              <span class="flash-sale-title">⚡ Flash sale ends in: <span id="admin-timer">30</span>s</span>
+            </div>
+            <div class="flash-sale-track">
+              <div class="flash-sale-bar" id="admin-timer-bar" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Options and Stats -->
+        <div class="admin-split-right">
+          <div class="admin-options" id="admin-options" style="margin-top: 0;">
+            <!-- Options will be injected here -->
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="admin-stats">
+            <div class="admin-stat">
+              <span class="admin-stat-label">Orders geplaatst</span>
+              <span class="admin-stat-value" id="admin-answers-count">0 / 0</span>
+            </div>
+            <div class="admin-stat">
+              <span class="admin-stat-label">Klanten in sessie</span>
+              <span class="admin-stat-value" id="admin-players-ingame">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== LEADERBOARD VIEW ===== -->
+    <div id="view-leaderboard" class="hidden">
+      <div class="card admin-split">
+
+        <div class="admin-split-left">
+          <h2 class="section-title">Resultaat & bestsellers</h2>
+
+          <div class="admin-correct-answer" style="text-align: left; margin: 3rem 0;">
+            <span class="admin-correct-label">Ideale strategie:</span>
+            <span class="admin-correct-value" id="admin-correct-answer">—</span>
+          </div>
+
+          <div class="admin-question-info" style="text-align: left; margin-bottom: 2rem; font-size: 1.2rem;">
+            <span id="admin-question-progress">Verkoopdoel 1 / 20 afgerond</span>
+          </div>
+
+          <button class="btn btn-primary" id="next-question-btn">Ga naar de volgende sale →</button>
+        </div>
+
+        <div class="admin-split-right">
+          <ul class="leaderboard leaderboard--animated" id="admin-leaderboard"></ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== FINAL WINNER VIEW ===== -->
+    <div id="view-final" class="hidden">
+      <div class="card admin-split" style="min-height: 60vh;">
+
+        <!-- Left Side: Trophy and Winner -->
+        <div class="admin-split-left" style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center;">
+          
+          <div class="final-trophy" style="font-size: 5rem; margin-bottom: 1rem;">🏆</div>
+          <h2 class="final-title" style="font-size: 2.5rem; margin-bottom: 1rem;">Koningsdag Keet kampioen!</h2>
+
+          <div class="podium-container" id="podium-container">
+            
+            <div class="podium-pillar podium-2" id="podium-2">
+              <div class="podium-name" id="podium-name-2">—</div>
+              <div class="podium-score" id="podium-score-2">€ 0,-</div>
+              <div class="podium-block">2</div>
+            </div>
+
+            <div class="podium-pillar podium-1" id="podium-1">
+              <div class="podium-name" id="podium-name-1">—</div>
+              <div class="podium-score" id="podium-score-1">€ 0,-</div>
+              <div class="podium-block">1</div>
+            </div>
+
+            <div class="podium-pillar podium-3" id="podium-3">
+              <div class="podium-name" id="podium-name-3">—</div>
+              <div class="podium-score" id="podium-score-3">€ 0,-</div>
+              <div class="podium-block">3</div>
+            </div>
+
+          </div>
+
+          <div class="final-controls"
+            style="margin-top: 3rem; display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; max-width: 300px;">
+            <div
+              style="display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+              <span style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase;">Outro volume</span>
+              <input type="range" id="outro-volume-slider" min="0" max="100" value="100" style="width: 100%;">
+            </div>
+            <button id="reset-session-btn" class="btn btn-primary"
+              style="background: var(--accent-error); border: none; font-size: 1rem; padding: 15px; width: 100%;">🛑
+              Sluit sessie & reset</button>
+          </div>
+          <p class="credit" style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">door Rody Damman
+            · vibecoded met AI</p>
+        </div>
+
+        <!-- Right Side: Top 5 List -->
+        <div class="admin-split-right" style="display: flex; flex-direction: column;">
+          <h3 class="section-title" style="text-align: left; font-size: 1.8rem; margin-bottom: 1rem;">Behaalde doelen (4 t/m 7)</h3>
+          <ul class="leaderboard leaderboard--animated" id="final-leaderboard-admin" style="flex: 1; margin: 0;"></ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // ===== YOUTUBE PLAYER API =====
+    let ytPlayer;
+    let isMusicPlaying = false;
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '0',
+        width: '0',
+        // Load the playlist the user provided
+        videoId: '9dt61e-HeEk',
+        playerVars: {
+          listType: 'playlist',
+          list: 'RD9dt61e-HeEk',
+          autoplay: 0,
+          loop: 1,
+          controls: 0,
+          showinfo: 0,
+          modestbranding: 1
+        },
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      event.target.setVolume(30); // sets initial volume
+    }
+
+    document.getElementById('toggle-music-btn').addEventListener('click', function () {
+      if (!ytPlayer) return;
+      if (isMusicPlaying) {
+        ytPlayer.pauseVideo();
+        this.textContent = '🎵 Jukebox: UIT';
+        isMusicPlaying = false;
+      } else {
+        ytPlayer.playVideo();
+        this.textContent = '🎵 Jukebox: AAN';
+        isMusicPlaying = true;
+      }
+    });
+
+    document.getElementById('volume-slider').addEventListener('input', function (e) {
+      if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+        ytPlayer.setVolume(e.target.value);
+      }
+    });
+
+    const outroAudio = document.getElementById('outro-audio');
+
+    document.getElementById('outro-volume-slider').addEventListener('input', function (e) {
+      if (outroAudio) {
+        outroAudio.volume = e.target.value / 100;
+      }
+    });
+
+    // ===== FORMATTING =====
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
+    }
+
+    // Animation logic for smoothly sliding players
+    function renderSleekLeaderboard(container, top5) {
+      const medals = ['🥇', '🥈', '🥉', '', ''];
+      // Determine if large screen vs small screen to adjust heights
+      const isLargeScreen = window.innerWidth >= 1024;
+      const itemHeight = isLargeScreen ? 120 : 75;
+      const gap = isLargeScreen ? 20 : 12;
+
+      container.style.height = `${top5.length * (itemHeight + gap)}px`;
+
+      const renderedUsernames = new Set();
+
+      top5.forEach((p, i) => {
+        renderedUsernames.add(p.username);
+        let el = document.getElementById(`board-item-${p.username}-${container.id}`);
+
+        if (!el) {
+          el = document.createElement('li');
+          el.id = `board-item-${p.username}-${container.id}`;
+          el.className = 'leaderboard-item leaderboard-card';
+
+          el.innerHTML = `
+            <div class="leaderboard-card-rank" id="rank-${p.username}-${container.id}">${medals[i] || (i + 1)}</div>
+            <div class="leaderboard-card-name">${p.username}</div>
+            <div class="leaderboard-card-score" id="score-${p.username}-${container.id}">${formatCurrency(p.score)}</div>
+          `;
+
+          el.style.transform = `translateY(${i * (itemHeight + gap) + 40}px)`;
+          el.style.opacity = '0';
+          container.appendChild(el);
+          void el.offsetWidth;
+        } else {
+          document.getElementById(`rank-${p.username}-${container.id}`).textContent = medals[i] || (i + 1);
+          document.getElementById(`score-${p.username}-${container.id}`).textContent = formatCurrency(p.score);
+        }
+
+        el.style.transform = `translateY(${i * (itemHeight + gap)}px)`;
+        el.style.opacity = '1';
+      });
+
+      Array.from(container.children).forEach((child) => {
+        const username = child.id.split('-')[2];
+        if (!renderedUsernames.has(username)) {
+          child.style.opacity = '0';
+          child.style.transform = `translateY(500px)`;
+          setTimeout(() => child.remove(), 500);
+        }
+      });
+    }
+
+    // Animation logic for dramatic final TOP 7 podium presentation
+    function renderFinalLeaderboard(container, top7) {
+      container.innerHTML = ''; // Start clean
+      
+      const isLargeScreen = window.innerWidth >= 1024;
+      const itemHeight = isLargeScreen ? 100 : 75; 
+      const gap = isLargeScreen ? 15 : 12;
+
+      // Reset Podium (just in case)
+      for(let i=1; i<=3; i++) {
+        const pillar = document.getElementById(`podium-${i}`);
+        if(pillar) {
+          pillar.style.opacity = '0';
+          pillar.style.transform = 'translateY(100px)';
+        }
+      }
+
+      // Populate podium text
+      const top3 = top7.slice(0, 3);
+      for(let i=0; i<3; i++) {
+        const p = top3[i];
+        const nameEl = document.getElementById(`podium-name-${i+1}`);
+        const scoreEl = document.getElementById(`podium-score-${i+1}`);
+        if (nameEl && scoreEl) {
+          nameEl.textContent = p ? p.username : '—';
+          scoreEl.textContent = p ? formatCurrency(p.score) : '€ 0,-';
+        }
+      }
+
+      // Populate side list (4-7)
+      const runnersUp = top7.slice(3, 7);
+      container.style.height = `${runnersUp.length * (itemHeight + gap)}px`;
+
+      runnersUp.forEach((p, idx) => {
+        let el = document.createElement('li');
+        el.id = `final-item-${idx}`;
+        el.className = 'leaderboard-item leaderboard-card';
+        // Start hidden way below
+        el.style.transform = `translateY(${container.offsetHeight + 300}px)`;
+        el.style.opacity = '0';
+        
+        el.innerHTML = `
+          <div class="leaderboard-card-rank">${idx + 4}</div>
+          <div class="leaderboard-card-name">${p.username}</div>
+          <div class="leaderboard-card-score">${formatCurrency(p.score)}</div>
+        `;
+        container.appendChild(el);
+      });
+
+      // Sequential dramatic reveal
+      setTimeout(() => {
+        
+        // 1. Reveal side list quickly
+        runnersUp.forEach((p, idx) => {
+          const el = document.getElementById(`final-item-${idx}`);
+          if (el) {
+            setTimeout(() => {
+              el.style.transform = `translateY(${idx * (itemHeight + gap)}px)`;
+              el.style.opacity = '1';
+            }, 500); // 0.5s all side items slide up
+          }
+        });
+
+
+
+        // 3. Reveal Bronze #3
+        setTimeout(() => {
+          const p3 = document.getElementById('podium-3');
+          if(p3) { p3.style.transform = 'translateY(0)'; p3.style.opacity = '1'; }
+        }, 3500);
+
+        // 4. Reveal Silver #2
+        setTimeout(() => {
+          const p2 = document.getElementById('podium-2');
+          if(p2) { p2.style.transform = 'translateY(0)'; p2.style.opacity = '1'; }
+        }, 7000);
+
+        // 5. Reveal Gold #1 with Confetti! (And perfect drop)
+        setTimeout(() => {
+          const p1 = document.getElementById('podium-1');
+          if(p1) { p1.style.transform = 'translateY(0)'; p1.style.opacity = '1'; }
+
+          if (typeof confetti === 'function') {
+            confetti({
+              particleCount: 300,
+              spread: 140,
+              origin: { y: 0.6 },
+              startVelocity: 55,
+              colors: ['#FFD700', '#FFA500', '#FF4500', '#9400D3', '#00BFFF']
+            });
+          }
+        }, 11000);
+
+      }, 100);
+    }
+
+    // ===== DOM ELEMENTS =====
+    const viewLobby = document.getElementById('view-lobby');
+    const viewQuestion = document.getElementById('view-question');
+    const viewLeaderboard = document.getElementById('view-leaderboard');
+    const viewFinal = document.getElementById('view-final');
+
+    const playerCountEl = document.getElementById('admin-player-count');
+    const playerListEl = document.getElementById('admin-player-list');
+    const waitingEl = document.getElementById('admin-waiting');
+    const startBtn = document.getElementById('start-game-btn');
+    const nextBtn = document.getElementById('next-question-btn');
+    const skipBtn = document.getElementById('skip-question-btn');
+
+    const questionCounter = document.getElementById('question-counter');
+    const timerEl = document.getElementById('admin-timer');
+    const timerBarEl = document.getElementById('admin-timer-bar');
+    const questionText = document.getElementById('admin-question-text');
+    const optionsEl = document.getElementById('admin-options');
+    const answersCount = document.getElementById('admin-answers-count');
+    const playersIngame = document.getElementById('admin-players-ingame');
+
+    const adminCorrectAnswer = document.getElementById('admin-correct-answer');
+    const adminQuestionProgress = document.getElementById('admin-question-progress');
+
+    let totalPlayers = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const qrImg = document.getElementById('qr-code-img');
+      const size = Math.floor(Math.min(window.innerHeight * 0.75, 400)); // Dynamic size up to 400px
+      if (qrImg) qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(window.location.origin)}`;
+    });
+
+    // ===== VIEW SWITCHING =====
+    function showView(view) {
+      viewLobby.classList.add('hidden');
+      viewQuestion.classList.add('hidden');
+      viewLeaderboard.classList.add('hidden');
+      viewFinal.classList.add('hidden');
+      view.classList.remove('hidden');
+
+      // Removed hiding of Jukebox on final screen, so admin can turn it back on.
+    }
+
+    socket.emit('adminJoin');
+
+    socket.on('adminConnected', () => {
+      console.log('👑 Admin connected to server');
+    });
+
+    socket.on('playerList', ({ players, count }) => {
+      playerCountEl.textContent = count;
+      totalPlayers = count;
+      playersIngame.textContent = count;
+
+      startBtn.disabled = count === 0;
+
+      if (count === 0) {
+        waitingEl.classList.remove('hidden');
+        playerListEl.innerHTML = '';
+      } else {
+        waitingEl.classList.add('hidden');
+        playerListEl.innerHTML = players
+          .map((name, i) => `
+            <li class="player-list-item" style="animation-delay: ${i * 60}ms">
+              <span class="player-list-number">${i + 1}</span>
+              <span class="player-list-name">${name}</span>
+            </li>
+          `)
+          .join('');
+      }
+    });
+
+    socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText: qText, options }) => {
+      showView(viewQuestion);
+      outroAudio.pause();
+      outroAudio.currentTime = 0;
+
+      questionCounter.textContent = `Sale ${questionIndex + 1} / ${totalQuestions}`;
+      questionText.textContent = qText;
+      answersCount.textContent = `0 / ${totalPlayers}`;
+
+      timerEl.textContent = '30';
+      timerBarEl.style.width = '100%';
+      document.querySelector('.flash-sale-container').classList.remove('flash-sale--urgent');
+
+      const colors = ['bol', 'amazon', 'shopify', 'purple'];
+      const icons = ['🛒', '🛍️', '📦', '🎁'];
+
+      optionsEl.innerHTML = options
+        .map((opt, i) => `
+          <div class="admin-option admin-option--${colors[i]}">
+            <span class="admin-option-icon">${icons[i]}</span>
+            <span class="admin-option-text">${opt}</span>
+          </div>
+        `)
+        .join('');
+    });
+
+    socket.on('timerUpdate', ({ time }) => {
+      timerEl.textContent = time;
+      timerBarEl.style.width = `${(time / 30) * 100}%`;
+
+      if (time <= 5) {
+        document.querySelector('.flash-sale-container').classList.add('flash-sale--urgent');
+      } else {
+        document.querySelector('.flash-sale-container').classList.remove('flash-sale--urgent');
+      }
+    });
+
+    socket.on('playerAnswered', ({ count, total }) => {
+      answersCount.textContent = `${count} / ${total}`;
+    });
+
+    socket.on('showLeaderboard', ({ correctAnswer, top5, isLastQuestion, questionIndex, totalQuestions }) => {
+
+      if (isLastQuestion) {
+        
+        // Auto-pause jukebox to let the epic outro play
+        if (typeof ytPlayer !== 'undefined' && ytPlayer && isMusicPlaying) {
+          ytPlayer.pauseVideo();
+          document.getElementById('toggle-music-btn').textContent = '🎵 Jukebox: UIT';
+          isMusicPlaying = false;
+        }
+
+        // Play Outro Music immediately at the start of the final screen
+        if (outroAudio) {
+          outroAudio.currentTime = 0;
+          outroAudio.play().catch(e => console.warn("Browser auto-play prevented audio:", e));
+        }
+
+        showView(viewFinal);
+
+        const finalLeaderboard = document.getElementById('final-leaderboard-admin');
+        renderFinalLeaderboard(finalLeaderboard, top5); // top5 variable from socket actually holds top7 because of serverside rename
+
+        // (We no longer explicitly set winner-name here, it's handled inside renderFinalLeaderboard)
+      } else {
+        showView(viewLeaderboard);
+
+        adminCorrectAnswer.textContent = correctAnswer;
+        adminQuestionProgress.textContent = `Sale ${questionIndex + 1} / ${totalQuestions} afgerond`;
+
+        const adminLeaderboard = document.getElementById('admin-leaderboard');
+        renderSleekLeaderboard(adminLeaderboard, top5);
+      }
+    });
+
+    // ===== BUTTON HANDLERS =====
+    startBtn.addEventListener('click', () => socket.emit('adminStartQuestion'));
+    nextBtn.addEventListener('click', () => socket.emit('adminNextQuestion'));
+    skipBtn.addEventListener('click', () => socket.emit('adminSkipQuestion'));
+
+    const forceEndBtn = document.getElementById('force-end-btn');
+    if (forceEndBtn) {
+      forceEndBtn.addEventListener('click', () => {
+        if (confirm('Weet je zeker dat je per direct naar de finale wilt gaan?')) {
+          socket.emit('adminForceEndGame');
+        }
+      });
+    }
+
+    const resetBtn = document.getElementById('reset-session-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        console.log("Reset knop geklikt");
+        if (confirm('Weet je zeker dat je alle telefoons wilt kicken en de score wilt wissen?')) {
+          console.log("Reset bevestigd");
+          socket.emit('adminResetSession');
+        }
+      });
+    }
+
+    socket.on('adminSoftReset', () => {
+      console.log('Soft Reset Triggered: Zachte reset naar het dashboard');
+      showView(viewLobby);
+      playerCountEl.textContent = '0';
+      playerListEl.innerHTML = '';
+      waitingEl.classList.remove('hidden');
+      startBtn.disabled = true;
+      if (outroAudio) {
+        outroAudio.pause();
+        outroAudio.currentTime = 0;
+      }
+      if (typeof confetti === 'function') {
+        confetti.reset();
+      }
+    });
+
+    socket.on('forceReload', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+
+</html>

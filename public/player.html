@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="De Grote Koningsdag Keet Quiz — Speler scherm">
+  <title>Koningsdag Keet Quiz — Speler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container container--player">
+    <div class="logo logo--small">
+      <h1>🛒 Koningsdag Keet Quiz</h1>
+    </div>
+
+    <!-- ===== WAITING VIEW (Shopping Cart Empty) ===== -->
+    <div id="view-waiting">
+      <div class="card card--waiting">
+        <div class="player-welcome">
+          <p class="status-label">Ingelogd als,</p>
+          <p class="player-name-display" id="player-name">Topper</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="waiting-animation-container">
+          <p class="status status-waiting" id="status-text">Wachten tot de webshop opengaat...</p>
+        </div>
+
+        <div class="player-count" id="player-count">
+          <span id="player-count-number">0</span> actieve shoppers
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUESTION VIEW (Flash Sale) ===== -->
+    <div id="view-question" class="hidden">
+      <div class="question-progress">
+        <span class="question-progress-text" id="question-counter-player">Product 1 / 20</span>
+      </div>
+
+      <!-- Flash Sale Timer -->
+      <div class="flash-sale-container">
+        <div class="flash-sale-header">
+          <span class="flash-sale-title">⚡ FLASH SALE ENDS IN: <span id="player-timer-text">30</span>s</span>
+        </div>
+        <div class="flash-sale-track">
+          <div class="flash-sale-bar" id="player-timer-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <p class="question-text" id="player-question-text">Vraag wordt geladen...</p>
+
+      <div class="answers-grid" id="answers-grid">
+        <!-- Buttons injected by JS (Add to Cart style) -->
+      </div>
+    </div>
+
+    <!-- ===== ANSWERED VIEW (Processing) ===== -->
+    <div id="view-answered" class="hidden">
+      <div class="card">
+        <div class="answered-feedback">
+          <div class="answered-icon spinner-large"></div>
+          <p class="answered-text">Order wordt verwerkt...</p>
+          <p class="answered-sub status-waiting">Wacht op bevestiging van betaling...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LEADERBOARD / RESULT VIEW (Checkout Result) ===== -->
+    <div id="view-result" class="hidden">
+      <div class="card result-card">
+        <!-- Correct/Incorrect feedback full section -->
+        <div id="player-feedback" class="feedback">
+          <div class="feedback-icon" id="feedback-icon">✅</div>
+          <p class="feedback-text" id="feedback-text">Order Confirmed!</p>
+        </div>
+
+        <div class="result-answer">
+          <span class="result-answer-label">De Koningsdag Keet Guru zegt:</span>
+          <span class="result-answer-value" id="correct-answer-text">—</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="result-score">
+          <span class="result-score-label">Nieuwe profit ⭐</span>
+          <span class="result-score-value" id="player-total-score">€ 0,-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FINAL WINNER VIEW (Bestseller Dashboard) ===== -->
+    <div id="view-final" class="hidden">
+      <div class="card final-card">
+        <div class="final-trophy">🏆</div>
+        <h2 class="final-title">Webshop gesloten!</h2>
+
+        <div id="final-personal" class="final-personal">
+          <p class="final-personal-label">Jouw totale omzet:</p>
+          <p class="final-personal-score" id="final-score">€ 0,-</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="section-title" style="text-align:center;">Jouw positie in de Bestseller Lijst</h3>
+        <ul class="leaderboard" id="final-leaderboard"></ul>
+
+        <p class="credit" style="margin-top: var(--space-lg);">door Rody Damman · vibecoded met AI</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
