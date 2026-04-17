@@ -97,6 +97,7 @@
             </button>
           </div>
 
+          <img id="admin-question-image" src="" alt="Vraag afbeelding" style="width: 100%; border-radius: 8px; margin-bottom: 20px; max-height: 350px; object-fit: contain; display: none;">
           <p class="question-text" id="admin-question-text">Productbeschrijving wordt geladen...</p>
 
           <div class="flash-sale-container" style="margin-top: auto; width: 100%;">
@@ -498,7 +499,7 @@
       }
     });
 
-    socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText: qText, options }) => {
+    socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText: qText, options, image }) => {
       showView(viewQuestion);
       outroAudio.pause();
       outroAudio.currentTime = 0;
@@ -506,6 +507,17 @@
       questionCounter.textContent = `Sale ${questionIndex + 1} / ${totalQuestions}`;
       questionText.textContent = qText;
       answersCount.textContent = `0 / ${totalPlayers}`;
+      
+      const imgEl = document.getElementById('admin-question-image');
+      if (imgEl) {
+        if (image) {
+          imgEl.src = image;
+          imgEl.style.display = 'block';
+        } else {
+          imgEl.style.display = 'none';
+          imgEl.src = '';
+        }
+      }
 
       timerEl.textContent = '30';
       timerBarEl.style.width = '100%';

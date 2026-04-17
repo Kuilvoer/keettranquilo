@@ -169,13 +169,24 @@ if (isPlayerPage) {
   });
 
   // New question received
-  socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText, options }) => {
+  socket.on('newQuestion', ({ questionIndex, totalQuestions, questionText, options, image }) => {
     selectedAnswer = null;
     currentOptions = options;
     showView(viewQuestion);
 
     questionCounter.textContent = `Vraag ${questionIndex + 1} / ${totalQuestions}`;
     questionTextEl.textContent = questionText;
+
+    const imgEl = document.getElementById('player-question-image');
+    if (imgEl) {
+      if (image) {
+        imgEl.src = image;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+        imgEl.src = '';
+      }
+    }
 
     // E-commerce CTA Button Styles
     const colors = ['bol', 'amazon', 'shopify', 'purple'];
