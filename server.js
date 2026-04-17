@@ -437,8 +437,8 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-const PORT = 3000;
-server.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🎮 Rody Quiz server running at http://localhost:${PORT}`);
   console.log(`📌 Game PIN: ${GAME_PIN}`);
   console.log(`👑 Admin panel: http://localhost:${PORT}/admin.html`);
